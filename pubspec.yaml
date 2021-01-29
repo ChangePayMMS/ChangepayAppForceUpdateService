@@ -1,6 +1,6 @@
 name: esamudaay_app_update
 description: A new Flutter package project.
-version: 0.0.1
+version: 0.0.1+2
 author:
 
 environment:
@@ -13,7 +13,8 @@ dependencies:
   url_launcher: ^5.4.11
   in_app_update: ^1.1.15
   esamudaay_themes:
-    git: git@bitbucket.org:ese1/esm_comp_themes.git
+    git:
+      url: https://anushka_agrawal@bitbucket.org/ese1/esm_comp_themes.git
 
 dev_dependencies:
   flutter_test:

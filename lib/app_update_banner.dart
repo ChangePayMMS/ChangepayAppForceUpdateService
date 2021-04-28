@@ -8,16 +8,12 @@ class AppUpdateBanner extends StatelessWidget {
   final EsamudaayThemeData customThemeData;
   final String packageName;
   const AppUpdateBanner({
-    @required this.updateMessage,
-    @required this.updateButtonText,
-    @required this.customThemeData,
-    @required this.packageName,
-    Key key,
-  })  : assert(
-          updateMessage != null && updateButtonText != null,
-          "updateMessage and updateButtonText cannot be null",
-        ),
-        super(key: key);
+    required this.updateMessage,
+    required this.updateButtonText,
+    required this.customThemeData,
+    required this.packageName,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

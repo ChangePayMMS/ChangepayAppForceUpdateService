@@ -14,9 +14,9 @@ class AppUpdateService {
   static AppUpdateService _instance = AppUpdateService._();
   factory AppUpdateService() => _instance;
 
-  static bool _isUpdateAvailable;
-  static _UPDATE_TYPE _updateType;
-  static bool _isSelectedLater;
+  static bool _isUpdateAvailable = false;
+  static _UPDATE_TYPE _updateType = _UPDATE_TYPE.NONE;
+  static bool _isSelectedLater = false;
 
   static bool get isSelectedLater => _isSelectedLater;
 
@@ -44,12 +44,12 @@ class AppUpdateService {
 
       /// Possible values for updateAvailability are
       /// unknown , updateNotAvailable , updateAvailable , developerTriggeredUpdateInProgress.
-      _isUpdateAvailable = appUpdateInfo?.updateAvailability ==
+      _isUpdateAvailable = appUpdateInfo.updateAvailability ==
           UpdateAvailability.updateAvailable;
 
-      _updateType = (appUpdateInfo?.flexibleUpdateAllowed ?? false)
+      _updateType = appUpdateInfo.flexibleUpdateAllowed
           ? _UPDATE_TYPE.FLEXIBLE
-          : (appUpdateInfo?.immediateUpdateAllowed ?? false)
+          : appUpdateInfo.immediateUpdateAllowed
               ? _UPDATE_TYPE.IMMEDIATE
               : _UPDATE_TYPE.NONE;
 
@@ -62,14 +62,14 @@ class AppUpdateService {
   }
 
   static Future<void> showUpdateDialog({
-    @required BuildContext context,
-    @required String title,
-    @required String message,
-    @required String laterButtonText,
-    @required String updateButtonText,
-    @required Widget logoImage,
-    @required EsamudaayThemeData customThemeData,
-    @required String packageName,
+    required BuildContext context,
+    required String title,
+    required String message,
+    required String laterButtonText,
+    required String updateButtonText,
+    required Widget logoImage,
+    required EsamudaayThemeData customThemeData,
+    required String packageName,
   }) async {
     // show app update dialog only if update is available and update priority is atleast flexible.
     if (_isUpdateAvailable && (_updateType != _UPDATE_TYPE.NONE)) {
@@ -84,9 +84,8 @@ class AppUpdateService {
               title: title,
               message: message,
               updateButtonText: updateButtonText,
-              laterButtonText: _updateType == _UPDATE_TYPE.IMMEDIATE
-                  ? null
-                  : laterButtonText,
+              laterButtonText:
+                  _updateType == _UPDATE_TYPE.IMMEDIATE ? "" : laterButtonText,
               onLater: () {
                 _isSelectedLater = true;
                 Navigator.of(context).pop();

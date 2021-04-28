@@ -45,9 +45,7 @@ class AppUpdateService {
       /// Possible values for updateAvailability are
       /// unknown , updateNotAvailable , updateAvailable , developerTriggeredUpdateInProgress.
       _isUpdateAvailable = appUpdateInfo?.updateAvailability ==
-              UpdateAvailability.updateAvailable
-          ? true
-          : false;
+          UpdateAvailability.updateAvailable;
 
       _updateType = (appUpdateInfo?.flexibleUpdateAllowed ?? false)
           ? _UPDATE_TYPE.FLEXIBLE

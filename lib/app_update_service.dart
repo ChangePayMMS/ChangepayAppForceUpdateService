@@ -42,6 +42,8 @@ class AppUpdateService {
 
       debugPrint("appUpdateInfo => $appUpdateInfo");
 
+      /// Possible values for updateAvailability are
+      /// unknown , updateNotAvailable , updateAvailable , developerTriggeredUpdateInProgress.
       _isUpdateAvailable = appUpdateInfo?.updateAvailability ==
               UpdateAvailability.updateAvailable
           ? true

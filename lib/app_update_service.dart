@@ -42,7 +42,10 @@ class AppUpdateService {
 
       debugPrint("appUpdateInfo => $appUpdateInfo");
 
-      _isUpdateAvailable = appUpdateInfo?.updateAvailable ?? false;
+      _isUpdateAvailable = appUpdateInfo?.updateAvailability ==
+              UpdateAvailability.updateAvailable
+          ? true
+          : false;
 
       _updateType = (appUpdateInfo?.flexibleUpdateAllowed ?? false)
           ? _UPDATE_TYPE.FLEXIBLE

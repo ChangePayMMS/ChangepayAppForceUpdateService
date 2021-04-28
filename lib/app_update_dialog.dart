@@ -5,17 +5,17 @@ class AppUpdateDialog extends StatelessWidget {
   final String title;
   final String message;
   final String updateButtonText;
-  final String laterButtonText;
+  final String? laterButtonText;
   final VoidCallback onUpdate;
-  final VoidCallback onLater;
+  final VoidCallback? onLater;
   final Widget headerWidget;
   final EsamudaayThemeData customThemeData;
   AppUpdateDialog({
     required this.title,
     required this.message,
     required this.updateButtonText,
-    required this.laterButtonText,
-    required this.onLater,
+    this.laterButtonText,
+    this.onLater,
     required this.onUpdate,
     required this.headerWidget,
     required this.customThemeData,
@@ -65,8 +65,8 @@ class AppUpdateDialog extends StatelessWidget {
                     Expanded(
                       child: _CustomIconButton(
                         icon: Icons.clear,
-                        text: laterButtonText,
-                        onTap: onLater,
+                        text: laterButtonText ?? "",
+                        onTap: () => onLater ?? null,
                         customThemeData: customThemeData,
                       ),
                     ),

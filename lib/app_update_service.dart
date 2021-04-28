@@ -14,9 +14,9 @@ class AppUpdateService {
   static AppUpdateService _instance = AppUpdateService._();
   factory AppUpdateService() => _instance;
 
-  static bool _isUpdateAvailable = false;
-  static _UPDATE_TYPE _updateType = _UPDATE_TYPE.NONE;
-  static bool _isSelectedLater = false;
+  static late final bool _isUpdateAvailable;
+  static late final _UPDATE_TYPE _updateType;
+  static late final bool _isSelectedLater;
 
   static bool get isSelectedLater => _isSelectedLater;
 
@@ -102,12 +102,12 @@ class AppUpdateService {
   static Future<void> updateApp(String packageName) async {
     // TODO : IOS platform implementation.
 
-    String PLAY_STORE_URL =
+    String playStoreUrl =
         'https://play.google.com/store/apps/details?id=$packageName';
-    if (await canLaunch(PLAY_STORE_URL)) {
-      await launch(PLAY_STORE_URL);
+    if (await canLaunch(playStoreUrl)) {
+      await launch(playStoreUrl);
     } else {
-      throw 'Could not launch $PLAY_STORE_URL';
+      throw 'Could not launch $playStoreUrl';
     }
   }
 }

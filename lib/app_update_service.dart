@@ -16,7 +16,7 @@ class AppUpdateService {
 
   static late final bool _isUpdateAvailable;
   static late final _UPDATE_TYPE _updateType;
-  static late final bool _isSelectedLater;
+  static late bool _isSelectedLater;
 
   static bool get isSelectedLater => _isSelectedLater;
 

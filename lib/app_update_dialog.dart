@@ -5,21 +5,21 @@ class AppUpdateDialog extends StatelessWidget {
   final String title;
   final String message;
   final String updateButtonText;
-  final String laterButtonText;
+  final String? laterButtonText;
   final VoidCallback onUpdate;
   final VoidCallback onLater;
   final Widget headerWidget;
   final EsamudaayThemeData customThemeData;
-  const AppUpdateDialog({
-    @required this.title,
-    @required this.message,
-    @required this.updateButtonText,
-    @required this.laterButtonText,
-    @required this.onLater,
-    @required this.onUpdate,
-    @required this.headerWidget,
-    @required this.customThemeData,
-    Key key,
+  AppUpdateDialog({
+    required this.title,
+    required this.message,
+    required this.updateButtonText,
+    this.laterButtonText,
+    required this.onLater,
+    required this.onUpdate,
+    required this.headerWidget,
+    required this.customThemeData,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -43,7 +43,7 @@ class AppUpdateDialog extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 46),
                 child: Text(
-                  title ?? "",
+                  title,
                   style: customThemeData.textStyles.topTileTitle
                       .copyWith(fontWeight: FontWeight.w400),
                   textAlign: TextAlign.center,
@@ -53,7 +53,7 @@ class AppUpdateDialog extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30),
                 child: Text(
-                  message ?? "",
+                  message,
                   style: customThemeData.textStyles.cardTitle,
                   textAlign: TextAlign.center,
                 ),
@@ -93,16 +93,16 @@ class AppUpdateDialog extends StatelessWidget {
 class _CustomIconButton extends StatelessWidget {
   final IconData icon;
   final String text;
-  final Function onTap;
-  final Color color;
+  final void Function() onTap;
+  final Color? color;
   final EsamudaayThemeData customThemeData;
   const _CustomIconButton({
-    @required this.icon,
-    @required this.text,
-    @required this.onTap,
-    @required this.customThemeData,
+    required this.icon,
+    required this.text,
+    required this.onTap,
+    required this.customThemeData,
     this.color,
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override

@@ -5,7 +5,7 @@ import 'package:esamudaay_app_update/update_info.dart';
 import 'package:esamudaay_app_update/string_constants.dart';
 import 'package:esamudaay_themes/esamudaay_themes.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:store_redirect/store_redirect.dart';
 
 enum APP_TYPE { CONSUMER, DELIVERY, SELLER }
 
@@ -119,7 +119,8 @@ class AppUpdateService {
     required String updateButtonText,
     required Widget logoImage,
     required EsamudaayThemeData customThemeData,
-    required String packageName,
+    required String androidPackageName,
+    String appleStoreID = '',
     bool selectedLater = false,
   }) async {
     if (!_updateInfo.updateAvailable ||
@@ -143,7 +144,7 @@ class AppUpdateService {
             message: message,
             updateButtonText: updateButtonText,
             laterButtonText: laterButtonText,
-            onUpdate: () => updateApp(packageName),
+            onUpdate: () => updateApp(androidPackageName, appleStoreID),
             headerWidget: logoImage,
             isForcedUpdate:
                 _updateInfo.getUpdateType() == UPDATE_TYPE.IMMEDIATE,
@@ -157,15 +158,10 @@ class AppUpdateService {
     );
   }
 
-  static Future<void> updateApp(String packageName) async {
-    // TODO : IOS platform implementation.
-
-    String playStoreUrl =
-        'https://play.google.com/store/apps/details?id=$packageName';
-    if (await canLaunch(playStoreUrl)) {
-      await launch(playStoreUrl);
-    } else {
-      throw 'Could not launch $playStoreUrl';
-    }
+  static Future<void> updateApp(
+    String androidId,
+    String appleAppId,
+  ) async {
+    await StoreRedirect.redirect(androidAppId: androidId, iOSAppId: appleAppId);
   }
 }

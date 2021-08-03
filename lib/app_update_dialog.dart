@@ -5,20 +5,23 @@ class AppUpdateDialog extends StatelessWidget {
   final String title;
   final String message;
   final String updateButtonText;
-  final String? laterButtonText;
+  final String laterButtonText;
   final VoidCallback onUpdate;
   final VoidCallback onLater;
   final Widget headerWidget;
   final EsamudaayThemeData customThemeData;
+  final bool isForcedUpdate;
+
   AppUpdateDialog({
     required this.title,
     required this.message,
     required this.updateButtonText,
-    this.laterButtonText,
+    required this.laterButtonText,
     required this.onLater,
     required this.onUpdate,
     required this.headerWidget,
     required this.customThemeData,
+    required this.isForcedUpdate,
     Key? key,
   }) : super(key: key);
 
@@ -61,11 +64,12 @@ class AppUpdateDialog extends StatelessWidget {
               SizedBox(height: 25),
               Row(
                 children: [
-                  if (laterButtonText != null) ...{
+                  if (!isForcedUpdate) ...{
+                    // Add the later button box only if not forced update
                     Expanded(
                       child: _CustomIconButton(
                         icon: Icons.clear,
-                        text: laterButtonText ?? "",
+                        text: laterButtonText,
                         onTap: onLater,
                         customThemeData: customThemeData,
                       ),

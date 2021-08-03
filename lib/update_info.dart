@@ -38,7 +38,7 @@ class UpdateInfo {
     _priorityCode = _priorityCode ?? 0; // can assume the code won't be null
     if (_priorityCode! == 0)
       return UPDATE_TYPE.NONE;
-    else if (_priorityCode! <= 3)
+    else if (_priorityCode! <= 4)
       return UPDATE_TYPE.FLEXIBLE;
     else
       return UPDATE_TYPE.IMMEDIATE;

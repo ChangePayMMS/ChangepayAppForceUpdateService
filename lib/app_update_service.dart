@@ -6,7 +6,7 @@ import 'package:esamudaay_themes/esamudaay_themes.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-enum APP_TYPE { CONSUMER, DELIVERY, MERCHANT }
+enum APP_TYPE { CONSUMER, DELIVERY, SELLER }
 
 extension ParseToString on APP_TYPE {
   /// Converts enum value to a string value that is expected by the API
@@ -46,6 +46,12 @@ class _GetUpdateInfo {
       },
       responseType: ResponseType.json,
     ));
+
+    dio.interceptors.add(LogInterceptor(
+        responseBody: true,
+        request: true,
+        requestBody: true,
+        requestHeader: true));
 
     // Initialize to no update
     UpdateInfo result = UpdateInfo(

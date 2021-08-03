@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:esamudaay_app_update/app_update_dialog.dart';
 import 'package:esamudaay_app_update/update_info.dart';
+import 'package:esamudaay_app_update/string_constants.dart';
 import 'package:esamudaay_themes/esamudaay_themes.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -25,18 +26,13 @@ extension ParseToString on APP_TYPE {
 
 /// Fetches app update information from the backend
 class _GetUpdateInfo {
-  static final String _liveURL = "https://api.esamudaay.com/";
-  static final String _testURL = "https://api.test.esamudaay.com/";
-
-  static final String _apiURL = "api/v1/frontend/version/latest";
-
   static Future<UpdateInfo> fetch({
     required int buildNumber,
     required APP_TYPE appType,
     bool isTesting = false,
   }) async {
     Dio dio = new Dio(new BaseOptions(
-      baseUrl: (isTesting ? _testURL : _liveURL),
+      baseUrl: (isTesting ? testURL : liveURL),
       connectTimeout: 50000,
       receiveTimeout: 100000,
       followRedirects: false,
@@ -55,10 +51,13 @@ class _GetUpdateInfo {
 
     // Initialize to no update
     UpdateInfo result = UpdateInfo(
-        updateAvailable: false, latestVersion: null, priorityCode: null);
+      updateAvailable: false,
+      latestVersion: 0,
+      priorityCode: 0,
+    );
 
     try {
-      await dio.get(_apiURL, queryParameters: {
+      await dio.get(apiURL, queryParameters: {
         'app_type': appType.stringify(),
         'app_version': buildNumber,
       }).then((response) => {

@@ -1,11 +1,79 @@
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:esamudaay_app_update/app_update_dialog.dart';
+import 'package:esamudaay_app_update/update_info.dart';
+import 'package:esamudaay_app_update/string_constants.dart';
 import 'package:esamudaay_themes/esamudaay_themes.dart';
 import 'package:flutter/material.dart';
-import 'package:in_app_update/in_app_update.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:store_redirect/store_redirect.dart';
 
-enum _UPDATE_TYPE { IMMEDIATE, FLEXIBLE, NONE }
+enum APP_TYPE { CONSUMER, DELIVERY, SELLER }
+
+extension ParseToString on APP_TYPE {
+  /// Converts enum value to a string value that is expected by the API
+  String stringify() {
+    // Convert object to string, will traslate to `_API_FIELDS.<type>` - split
+    // at period, get last element of array
+    String result = this.toString().split('.').last;
+
+    if (Platform.isIOS)
+      // For iOS consumer app, return result as "CONSUMER_IOS"
+      return result + "_IOS";
+
+    return result;
+  }
+}
+
+/// Fetches app update information from the backend
+class _GetUpdateInfo {
+  static Future<UpdateInfo> fetch({
+    required APP_TYPE appType,
+    bool isTesting = false,
+  }) async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    Dio dio = new Dio(new BaseOptions(
+      baseUrl: (isTesting ? testURL : liveURL),
+      connectTimeout: 50000,
+      receiveTimeout: 100000,
+      followRedirects: false,
+      validateStatus: (status) {
+        if (status != null) return status < 500;
+        return false;
+      },
+      responseType: ResponseType.json,
+    ));
+
+    dio.interceptors.add(LogInterceptor(
+        responseBody: true,
+        request: true,
+        requestBody: true,
+        requestHeader: true));
+
+    // Initialize to no update
+    UpdateInfo result = UpdateInfo(
+      updateAvailable: false,
+      latestVersion: 0,
+      priorityCode: 0,
+    );
+
+    try {
+      await dio.get(apiURL, queryParameters: {
+        'app_type': appType.stringify(),
+        'app_version': int.parse(packageInfo.buildNumber),
+      }).then((response) => {
+            if (response.statusCode != 200)
+              throw Exception("Response code ${response.statusCode} obtained")
+            else
+              result = UpdateInfo.fromJson(response.data)
+          });
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+
+    return result;
+  }
+}
 
 /// Generic methods to handle app update availavility.
 class AppUpdateService {
@@ -14,51 +82,32 @@ class AppUpdateService {
   static AppUpdateService _instance = AppUpdateService._();
   factory AppUpdateService() => _instance;
 
-  static late final bool _isUpdateAvailable;
-  static late final _UPDATE_TYPE _updateType;
-  static late bool _isSelectedLater;
+  static late bool _isSelectedLater = false;
+  static late final UpdateInfo _updateInfo;
 
   static bool get isSelectedLater => _isSelectedLater;
 
   static Future<void> checkAppUpdateAvailability({
+    required APP_TYPE appType,
     bool isTesting = false,
   }) async {
-    try {
-      // for testing pupose.
-      if (isTesting) {
-        _isUpdateAvailable = true;
-        _updateType = _UPDATE_TYPE.FLEXIBLE;
-        _isSelectedLater = false;
-        return;
-      }
-
-      // TODO : IOS platform implementation.
-      if (Platform.isIOS) {
-        throw Exception("ios implementation not found");
-      }
-
-      // InAppUpdate works for Android platform only.
-      final AppUpdateInfo appUpdateInfo = await InAppUpdate.checkForUpdate();
-
-      debugPrint("appUpdateInfo => $appUpdateInfo");
-
-      /// Possible values for updateAvailability are
-      /// unknown , updateNotAvailable , updateAvailable , developerTriggeredUpdateInProgress.
-      _isUpdateAvailable = appUpdateInfo.updateAvailability ==
-          UpdateAvailability.updateAvailable;
-
-      _updateType = appUpdateInfo.flexibleUpdateAllowed
-          ? _UPDATE_TYPE.FLEXIBLE
-          : appUpdateInfo.immediateUpdateAllowed
-              ? _UPDATE_TYPE.IMMEDIATE
-              : _UPDATE_TYPE.NONE;
-
-      _isSelectedLater = false;
-    } catch (e) {
-      _isUpdateAvailable = false;
-      _updateType = _UPDATE_TYPE.NONE;
-      _isSelectedLater = false;
+    if (Platform.isIOS && appType != APP_TYPE.CONSUMER) {
+      // For iOS platforms, only consumer apps will go beyond this point. Works
+      // as a failsafe to prevent crashes if the other apps are deployed to iOS
+      // without changes in this package
+      debugPrint('attempt to check updates for iOS without porting the ' +
+          'app update package - ignore the attempt');
+      return;
     }
+
+    _updateInfo = await _GetUpdateInfo.fetch(
+      appType: appType,
+      isTesting: isTesting,
+    );
+
+    if (!_updateInfo.updateAvailable)
+      // Other fields may be null if the `update` boolean is false - return
+      return null;
   }
 
   static Future<void> showUpdateDialog({
@@ -69,45 +118,49 @@ class AppUpdateService {
     required String updateButtonText,
     required Widget logoImage,
     required EsamudaayThemeData customThemeData,
-    required String packageName,
+    required String androidPackageName,
+    String appleStoreID = '',
+    bool selectedLater = false,
   }) async {
-    // show app update dialog only if update is available and update priority is atleast flexible.
-    if (_isUpdateAvailable && (_updateType != _UPDATE_TYPE.NONE)) {
-      await showDialog<String>(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return WillPopScope(
-            onWillPop: () async => Future.value(false),
-            child: AppUpdateDialog(
-              customThemeData: customThemeData,
-              title: title,
-              message: message,
-              updateButtonText: updateButtonText,
-              laterButtonText:
-                  _updateType == _UPDATE_TYPE.IMMEDIATE ? "" : laterButtonText,
-              onLater: () {
-                _isSelectedLater = true;
-                Navigator.of(context).pop();
-              },
-              onUpdate: () => updateApp(packageName),
-              headerWidget: logoImage,
-            ),
-          );
-        },
-      );
-    }
+    if (!_updateInfo.updateAvailable ||
+        _updateInfo.getUpdateType() == UPDATE_TYPE.NONE)
+      // Exit if no update is available, or update type is `NONE`
+      return;
+
+    if (_updateInfo.getUpdateType() == UPDATE_TYPE.FLEXIBLE && selectedLater)
+      // Return if the user has previously tapped on update later
+      return;
+
+    await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async => Future.value(false),
+          child: AppUpdateDialog(
+            customThemeData: customThemeData,
+            title: title,
+            message: message,
+            updateButtonText: updateButtonText,
+            laterButtonText: laterButtonText,
+            onUpdate: () => updateApp(androidPackageName, appleStoreID),
+            headerWidget: logoImage,
+            isForcedUpdate:
+                _updateInfo.getUpdateType() == UPDATE_TYPE.IMMEDIATE,
+            onLater: () {
+              _isSelectedLater = true;
+              Navigator.of(context).pop();
+            },
+          ),
+        );
+      },
+    );
   }
 
-  static Future<void> updateApp(String packageName) async {
-    // TODO : IOS platform implementation.
-
-    String playStoreUrl =
-        'https://play.google.com/store/apps/details?id=$packageName';
-    if (await canLaunch(playStoreUrl)) {
-      await launch(playStoreUrl);
-    } else {
-      throw 'Could not launch $playStoreUrl';
-    }
+  static Future<void> updateApp(
+    String androidId,
+    String appleAppId,
+  ) async {
+    await StoreRedirect.redirect(androidAppId: androidId, iOSAppId: appleAppId);
   }
 }

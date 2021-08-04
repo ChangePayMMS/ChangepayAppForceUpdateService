@@ -7,11 +7,14 @@ class AppUpdateBanner extends StatelessWidget {
   final String updateButtonText;
   final EsamudaayThemeData customThemeData;
   final String packageName;
+  final String appStoreId;
+
   const AppUpdateBanner({
     required this.updateMessage,
     required this.updateButtonText,
     required this.customThemeData,
     required this.packageName,
+    this.appStoreId = '',
     Key? key,
   }) : super(key: key);
 
@@ -33,7 +36,7 @@ class AppUpdateBanner extends StatelessWidget {
           ),
           SizedBox(width: 20),
           InkWell(
-            onTap: () => AppUpdateService.updateApp(packageName),
+            onTap: () => AppUpdateService.updateApp(packageName, appStoreId),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 23, vertical: 12),
               decoration: BoxDecoration(

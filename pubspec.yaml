@@ -11,8 +11,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  url_launcher: ^6.0.3
-  in_app_update: ^2.0.0
+  
+  dio: ^4.0.0
+  package_info_plus: ^1.0.4
+  store_redirect: ^2.0.0
   esamudaay_themes:
     git:
       url: https://anushka_agrawal@bitbucket.org/ese1/esm_comp_themes.git

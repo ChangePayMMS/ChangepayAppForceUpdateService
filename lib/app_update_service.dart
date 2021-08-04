@@ -5,6 +5,7 @@ import 'package:esamudaay_app_update/update_info.dart';
 import 'package:esamudaay_app_update/string_constants.dart';
 import 'package:esamudaay_themes/esamudaay_themes.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:store_redirect/store_redirect.dart';
 
 enum APP_TYPE { CONSUMER, DELIVERY, SELLER }
@@ -27,10 +28,10 @@ extension ParseToString on APP_TYPE {
 /// Fetches app update information from the backend
 class _GetUpdateInfo {
   static Future<UpdateInfo> fetch({
-    required int buildNumber,
     required APP_TYPE appType,
     bool isTesting = false,
   }) async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
     Dio dio = new Dio(new BaseOptions(
       baseUrl: (isTesting ? testURL : liveURL),
       connectTimeout: 50000,
@@ -59,7 +60,7 @@ class _GetUpdateInfo {
     try {
       await dio.get(apiURL, queryParameters: {
         'app_type': appType.stringify(),
-        'app_version': buildNumber,
+        'app_version': int.parse(packageInfo.buildNumber),
       }).then((response) => {
             if (response.statusCode != 200)
               throw Exception("Response code ${response.statusCode} obtained")
@@ -88,7 +89,6 @@ class AppUpdateService {
 
   static Future<void> checkAppUpdateAvailability({
     required APP_TYPE appType,
-    required int buildNumber,
     bool isTesting = false,
   }) async {
     if (Platform.isIOS && appType != APP_TYPE.CONSUMER) {
@@ -101,7 +101,6 @@ class AppUpdateService {
     }
 
     _updateInfo = await _GetUpdateInfo.fetch(
-      buildNumber: buildNumber,
       appType: appType,
       isTesting: isTesting,
     );

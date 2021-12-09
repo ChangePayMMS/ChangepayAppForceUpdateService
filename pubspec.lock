@@ -54,8 +54,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v0.0.2"
-      resolved-ref: "5e79fcb5fd5410de9e7f20e09fbf416a0057ab56"
+      ref: "v0.0.4"
+      resolved-ref: a678e1bc33a19a14a305092859c2eeebad04bf0a
       url: "https://anushka_agrawal@bitbucket.org/ese1/esm_comp_themes.git"
     source: git
     version: "0.0.1"

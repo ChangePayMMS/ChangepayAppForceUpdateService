@@ -18,7 +18,7 @@ dependencies:
   esamudaay_themes:
     git:
       url: https://anushka_agrawal@bitbucket.org/ese1/esm_comp_themes.git
-      ref: v0.0.2
+      ref: v0.0.4
 
 dev_dependencies:
   flutter_test:

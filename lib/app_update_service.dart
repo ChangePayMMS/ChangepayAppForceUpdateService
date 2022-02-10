@@ -57,13 +57,16 @@ class _GetUpdateInfo {
       latestVersion: 0,
       priorityCode: 0,
     );
-
+    Map<String, dynamic> queryParameters = {
+      'app_type': appType.stringify(),
+      'app_version': int.parse(packageInfo.buildNumber),
+    };
+    if (tpid != null) {
+      queryParameters['tpid'] = tpid;
+    }
     try {
-      await dio.get(apiURL, queryParameters: {
-        'app_type': appType.stringify(),
-        'app_version': int.parse(packageInfo.buildNumber),
-        'tpid': tpid,
-      }).then((response) => {
+      await dio.get(apiURL, queryParameters: queryParameters).then((response) =>
+          {
             if (response.statusCode != 200)
               throw Exception("Response code ${response.statusCode} obtained")
             else

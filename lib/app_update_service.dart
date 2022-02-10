@@ -57,9 +57,9 @@ class _GetUpdateInfo {
       latestVersion: 0,
       priorityCode: 0,
     );
-    Map<String, dynamic> queryParameters = {
+    final Map<String, dynamic> queryParameters = {
       'app_type': appType.stringify(),
-      'app_version': int.parse(packageInfo.buildNumber),
+      'app_version': int.tryParse(packageInfo.buildNumber),
     };
     if (tpid != null) {
       queryParameters['tpid'] = tpid;

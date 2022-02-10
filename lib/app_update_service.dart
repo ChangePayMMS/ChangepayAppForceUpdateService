@@ -30,6 +30,7 @@ class _GetUpdateInfo {
   static Future<UpdateInfo> fetch({
     required APP_TYPE appType,
     bool isTesting = false,
+    String? tpid,
   }) async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     Dio dio = new Dio(new BaseOptions(
@@ -61,6 +62,7 @@ class _GetUpdateInfo {
       await dio.get(apiURL, queryParameters: {
         'app_type': appType.stringify(),
         'app_version': int.parse(packageInfo.buildNumber),
+        'tpid': tpid,
       }).then((response) => {
             if (response.statusCode != 200)
               throw Exception("Response code ${response.statusCode} obtained")
@@ -90,6 +92,7 @@ class AppUpdateService {
   static Future<void> checkAppUpdateAvailability({
     required APP_TYPE appType,
     bool isTesting = false,
+    String? tpid,
   }) async {
     if (Platform.isIOS && appType != APP_TYPE.CONSUMER) {
       // For iOS platforms, only consumer apps will go beyond this point. Works
@@ -103,6 +106,7 @@ class AppUpdateService {
     _updateInfo = await _GetUpdateInfo.fetch(
       appType: appType,
       isTesting: isTesting,
+      tpid: tpid,
     );
 
     if (!_updateInfo.updateAvailable)

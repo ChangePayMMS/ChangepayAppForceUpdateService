@@ -88,7 +88,7 @@ class AppUpdateService {
   factory AppUpdateService() => _instance;
 
   static late bool _isSelectedLater = false;
-  static late final UpdateInfo _updateInfo;
+  static UpdateInfo _updateInfo = UpdateInfo(updateAvailable: false, latestVersion: 0, priorityCode: 0);
 
   static bool get isSelectedLater => _isSelectedLater;
 

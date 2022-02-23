@@ -62,7 +62,7 @@ class _GetUpdateInfo {
       'app_version': int.tryParse(packageInfo.buildNumber),
     };
     if (tpid != null) {
-      queryParameters['tpid'] = tpid;
+      queryParameters['third_party_id'] = tpid;
     }
     try {
       await dio.get(apiURL, queryParameters: queryParameters).then((response) =>

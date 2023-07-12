@@ -35,8 +35,8 @@ class _GetUpdateInfo {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     Dio dio = new Dio(new BaseOptions(
       baseUrl: (isTesting ? testURL : liveURL),
-      connectTimeout: 50000,
-      receiveTimeout: 100000,
+      connectTimeout: Duration(seconds: 50),
+      receiveTimeout: Duration(seconds: 100),
       followRedirects: false,
       validateStatus: (status) {
         if (status != null) return status < 500;

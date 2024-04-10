@@ -12,13 +12,13 @@ dependencies:
   flutter:
     sdk: flutter
   
-  dio: ^4.0.0
-  package_info_plus: ^1.0.4
+  dio: ^5.2.1+1
+  package_info_plus: ^4.0.2
   store_redirect: ^2.0.0
   esamudaay_themes:
     git:
       url: https://anushka_agrawal@bitbucket.org/ese1/esm_comp_themes.git
-      ref: v0.0.5
+      ref: flutter-3.13.5-bump
 
 dev_dependencies:
   flutter_test:

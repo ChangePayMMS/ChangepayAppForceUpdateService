@@ -17,8 +17,8 @@ dependencies:
   store_redirect: ^2.0.0
   esamudaay_themes:
     git:
-      url: https://anushka_agrawal@bitbucket.org/ese1/esm_comp_themes.git
-      ref: flutter-3.13.5-bump
+      url: https://github.com/ChangePayMMS/ChangepayAppTheme
+      ref: main
 
 dev_dependencies:
   flutter_test:

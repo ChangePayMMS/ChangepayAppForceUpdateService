@@ -1,4 +1,4 @@
-final String liveURL = "https://api.esamudaay.com/";
-final String testURL = "https://api.test.esamudaay.com/";
+final String liveURL = "https://api.changepay.in/";
+final String testURL = "https://api.test.changepay.in/";
 
 final String apiURL = "api/v1/frontend/version/latest";

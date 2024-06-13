@@ -10,6 +10,15 @@ import 'package:store_redirect/store_redirect.dart';
 
 enum APP_TYPE { CONSUMER, DELIVERY, SELLER }
 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 extension ParseToString on APP_TYPE {
   /// Converts enum value to a string value that is expected by the API
   String stringify() {
@@ -88,7 +97,8 @@ class AppUpdateService {
   factory AppUpdateService() => _instance;
 
   static late bool _isSelectedLater = false;
-  static UpdateInfo _updateInfo = UpdateInfo(updateAvailable: false, latestVersion: 0, priorityCode: 0);
+  static UpdateInfo _updateInfo =
+      UpdateInfo(updateAvailable: false, latestVersion: 0, priorityCode: 0);
 
   static bool get isSelectedLater => _isSelectedLater;
 
@@ -97,6 +107,7 @@ class AppUpdateService {
     bool isTesting = false,
     String? tpid,
   }) async {
+    HttpOverrides.global = MyHttpOverrides();
     if (Platform.isIOS && appType != APP_TYPE.CONSUMER) {
       // For iOS platforms, only consumer apps will go beyond this point. Works
       // as a failsafe to prevent crashes if the other apps are deployed to iOS
